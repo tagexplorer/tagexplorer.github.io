@@ -31,3 +31,7 @@ To regen Playwright snapshots if you've confirmed the tests should pass:
 ```
 npm run regen-screenshots
 ```
+
+### Known issues
+
+Some of the images in this repository use filenames incompatible with Windows filesystems (backslash usage). WSL is recommended as a workaround when running into related issues.
