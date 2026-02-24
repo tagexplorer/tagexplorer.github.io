@@ -12,6 +12,8 @@ import {
   artistOrderAtom,
   gensPerPageAtom,
   type SearchParams,
+  type ArtistModel,
+  artistsModelAtom,
 } from '../globalState'
 import { type TagGroup, defaultPrompt } from '../tagGroups'
 import Fuse from 'fuse.js'
@@ -45,6 +47,7 @@ export const TagGroupBlock = ({
   const gensPerPage = useAtomValue(gensPerPageAtom)
   const collapsedGroups = useAtomValue(collapsedGroupsAtom)
   const setCollapsedGroups = useSetAtom(collapsedGroupsAtom)
+  const model = useAtomValue(artistsModelAtom)
   const tagGroupFilter = searchParams.tagGroupFilter?.replace(/\s+/g, '_') ?? ''
   const tagFilter = searchParams.tagFilter ?? ''
   const commonFuseOptions = useMemo(
@@ -71,9 +74,23 @@ export const TagGroupBlock = ({
   )
 
   const matchedTags = tagFuse.search(tagFilter).map((result) => result.item)
-  const tagsToShowWithoutBase = (tagFilter.trim() !== '' ? matchedTags : tagsWithIneffective)
-    .filter((tag) => !favoritesOnly || favorites.includes(tag.replace(/_fail_/g, '')))
-    .sort(sortArtists(artists ?? false, artistOrder, searchParams.randomSeed ?? ''))
+  const tagsToShowWithoutBase = useMemo(
+    () =>
+      (tagFilter.trim() !== '' ? matchedTags : tagsWithIneffective)
+        .filter((tag) => !favoritesOnly || favorites.includes(tag.replace(/_fail_/g, '')))
+        .sort(sortArtists(artists ?? false, artistOrder, searchParams.randomSeed ?? '', model)),
+    [
+      tagFilter,
+      matchedTags,
+      favoritesOnly,
+      favorites,
+      artistOrder,
+      searchParams.randomSeed,
+      model,
+      artists,
+      tagsWithIneffective,
+    ],
+  )
   const pageNumber = useMemo(() => searchParams.page ?? 1, [searchParams.page])
   const setPageNumber = (newPageNumber: number) => {
     // eslint-disable-next-line
@@ -329,12 +346,19 @@ const Gen = ({
 }
 
 const sortArtists =
-  (artists: boolean, artistOrder: string, seed: string) => (a: string, b: string) => {
+  (artists: boolean, artistOrder: string, seed: string, model: ArtistModel) =>
+  (a: string, b: string) => {
     const cleanA = a.replace(/_fail_/g, '')
     const cleanB = b.replace(/_fail_/g, '')
     type ArtistMetadata = Record<
       string,
-      { postCount: number; faveCount: number; score: number; uniqueness: number | null }
+      {
+        postCount: number
+        faveCount: number
+        score: number
+        animaUniqueness: number | null
+        ilUniqueness?: number | null
+      }
     >
     const metadata: ArtistMetadata = artistMetadata
     if (!artists || artistOrder === 'Alphabetical') {
@@ -370,8 +394,16 @@ const sortArtists =
       return bScore / bPosts - aScore / aPosts
     }
     if (artistOrder === 'Uniqueness') {
-      const aUniqueness = metadata[cleanA]?.uniqueness ?? 0
-      const bUniqueness = metadata[cleanB]?.uniqueness ?? 0
+      const uniquenessPropName = (() => {
+        switch (model) {
+          case 'Illustrious':
+            return 'ilUniqueness'
+          case 'Anima':
+            return 'animaUniqueness'
+        }
+      })()
+      const aUniqueness = metadata[cleanA]?.[uniquenessPropName] ?? 0
+      const bUniqueness = metadata[cleanB]?.[uniquenessPropName] ?? 0
       return bUniqueness - aUniqueness
     }
     if (artistOrder === 'Random') {
