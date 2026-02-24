@@ -15,7 +15,7 @@ import {
 } from '../globalState'
 import { type TagGroup, defaultPrompt } from '../tagGroups'
 import Fuse from 'fuse.js'
-import artistMetadata from '../assets/artistTags100posts.json'
+import artistMetadata from '../assets/artistTagsAll.json'
 import Rand from 'rand-seed'
 import ReactPaginate from 'react-paginate'
 import type { AnyRoute } from '@tanstack/react-router'
@@ -141,7 +141,8 @@ export const TagGroupBlock = ({
                 className="text-gray-700 dark:text-neutral-300 font-mono max-w-[400px]"
                 style={{ fontSize: '0.7rem', textAlign: 'right' }}
               >
-                {prompt ?? defaultPrompt} {artists ? 'TAG' : '(TAG:1.1)'}
+                {prompt ?? defaultPrompt}
+                {artists ? 'TAG' : ' (TAG:1.1)'}
               </div>
             </div>
           )}
@@ -331,7 +332,10 @@ const sortArtists =
   (artists: boolean, artistOrder: string, seed: string) => (a: string, b: string) => {
     const cleanA = a.replace(/_fail_/g, '')
     const cleanB = b.replace(/_fail_/g, '')
-    type ArtistMetadata = Record<string, { postCount: number; faveCount: number; score: number }>
+    type ArtistMetadata = Record<
+      string,
+      { postCount: number; faveCount: number; score: number; uniqueness: number | null }
+    >
     const metadata: ArtistMetadata = artistMetadata
     if (!artists || artistOrder === 'Alphabetical') {
       return cleanA.localeCompare(cleanB)
@@ -364,6 +368,11 @@ const sortArtists =
       const aPosts = metadata[cleanA]?.postCount || 1
       const bPosts = metadata[cleanB]?.postCount || 1
       return bScore / bPosts - aScore / aPosts
+    }
+    if (artistOrder === 'Uniqueness') {
+      const aUniqueness = metadata[cleanA]?.uniqueness ?? 0
+      const bUniqueness = metadata[cleanB]?.uniqueness ?? 0
+      return bUniqueness - aUniqueness
     }
     if (artistOrder === 'Random') {
       const rand = new Rand(seed + cleanA + cleanB)

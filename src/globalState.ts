@@ -39,11 +39,16 @@ export type ArtistOrder =
   | 'Score'
   | 'AverageFaveCount'
   | 'AverageScore'
+  | 'Uniqueness'
   | 'Random'
 
 export const artistOrderAtom = atomWithStorage<ArtistOrder>('artistOrder', 'Alphabetical')
 
 export const gensPerPageAtom = atomWithStorage<number>('gensPerPage', 50)
+
+export type ArtistModel = 'Illustrious' | 'Anima'
+
+export const artistsModelAtom = atomWithStorage<ArtistModel>('artistsModel', 'Illustrious')
 
 export const areSettingsCollapsed = atomWithStorage<boolean>('areSettingsCollapsed', false)
 

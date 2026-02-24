@@ -12,6 +12,8 @@ import {
   gensPerPageAtom,
   areSettingsCollapsed,
   type SearchParams,
+  artistsModelAtom,
+  type ArtistModel,
 } from '../globalState'
 import type { AnyRoute } from '@tanstack/react-router'
 import { Pill } from './Pill'
@@ -27,6 +29,7 @@ export const Settings = (props: {
   const [artistOrder, setArtistOrder] = useAtom(artistOrderAtom)
   const [favoritesOnly, setFavoritesOnly] = useAtom(favoritesOnlyAtom)
   const [gensPerPage, setGensPerPage] = useAtom(gensPerPageAtom)
+  const [artistsModel, setArtistsModel] = useAtom(artistsModelAtom)
   const [isCollapsed, setIsCollapsed] = useAtom(areSettingsCollapsed)
   const setCollapsedGroups = useSetAtom(collapsedGroupsAtom)
   // eslint-disable-next-line
@@ -130,23 +133,36 @@ export const Settings = (props: {
                   { value: 'Score', label: 'Score' },
                   { value: 'AverageFaveCount', label: 'Average favorites' },
                   { value: 'AverageScore', label: 'Average score' },
+                  { value: 'Uniqueness', label: 'Uniqueness (NEW!)' },
                   { value: 'Random', label: 'Random' },
                 ]}
               />
             )}
             {props.artistPage && (
-              <DropdownSetting
-                id="gensPerPage"
-                label="Images per page"
-                value={String(gensPerPage)}
-                onValueSelected={(value) => setGensPerPage(Number(value))}
-                options={[
-                  { value: '25', label: '25' },
-                  { value: '50', label: '50' },
-                  { value: '100', label: '100' },
-                  { value: '200', label: '200' },
-                ]}
-              />
+              <>
+                <DropdownSetting
+                  id="gensPerPage"
+                  label="Images per page"
+                  value={String(gensPerPage)}
+                  onValueSelected={(value) => setGensPerPage(Number(value))}
+                  options={[
+                    { value: '25', label: '25' },
+                    { value: '50', label: '50' },
+                    { value: '100', label: '100' },
+                    { value: '200', label: '200' },
+                  ]}
+                />
+                <DropdownSetting
+                  id="artistsModel"
+                  label="Model"
+                  value={artistsModel}
+                  onValueSelected={(value) => setArtistsModel(strToArtistModel(value))}
+                  options={[
+                    { value: 'Illustrious', label: 'Illustrious' },
+                    { value: 'Anima', label: 'Anima' },
+                  ]}
+                />
+              </>
             )}
           </div>
           <div className="flex gap-2 items-center flex-wrap">
@@ -266,3 +282,10 @@ const SearchBar = (props: {
     </div>
   </div>
 )
+
+const strToArtistModel = (str: string): ArtistModel => {
+  if (str === 'Illustrious' || str === 'Anima') {
+    return str
+  }
+  return 'Illustrious'
+}

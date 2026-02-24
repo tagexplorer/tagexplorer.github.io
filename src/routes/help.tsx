@@ -22,7 +22,7 @@ function Help() {
             Artist gens don't contain workflows because they were compressed to save storage and
             bandwidth. You can download this{' '}
             <a target="_blank" className="underline" href="/gens/sample_artist_workflow.png">
-              sample workflow
+              sample w orkflow
             </a>{' '}
             for reference. The only difference between gens is the artist tag.
           </li>
@@ -31,6 +31,9 @@ function Help() {
             on Danbooru. 385 unsupported artists were removed from the imageset by an automated
             visual similarity comparison. Artist tag support is checkpoint-dependent. Some "weak"
             artist tags might reveal their potential with higher tag weight.
+          </li>
+          <li>
+            The Anima artist list consists of 35959 artists with at least 50 posts on Danbooru.
           </li>
           <li>
             "Ineffective" tags were manually marked as such if they seemed to not have the intended
