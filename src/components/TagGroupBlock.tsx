@@ -95,6 +95,14 @@ export const TagGroupBlock = ({
   const setPageNumber = (newPageNumber: number) => {
     // eslint-disable-next-line
     void navigate({ search: { ...searchParams, page: newPageNumber } } as any)
+    // if the artists title element is not in view, scroll to it
+    if (!artists) return
+    const titleElement = document.getElementById('artists-title')
+    if (!titleElement) return
+    const titleRect = titleElement.getBoundingClientRect()
+    if (titleRect.top < 0 || titleRect.bottom > window.innerHeight) {
+      titleElement.scrollIntoView({ behavior: 'instant', block: 'start' })
+    }
   }
   const pages = chunkArray(tagsToShowWithoutBase, gensPerPage)
   const pageToShow = artists ? (pages[pageNumber - 1] ?? pages[0] ?? []) : tagsToShowWithoutBase
@@ -123,8 +131,9 @@ export const TagGroupBlock = ({
     >
       <div className="flex justify-between items-center flex-wrap">
         <div
-          className="flex justify-between items-center flex-wrap grow cursor-pointer"
+          className="flex justify-between items-center flex-wrap grow cursor-pointer scroll-mt-8"
           onClick={artists ? () => {} : toggleCollapse}
+          id={artists ? 'artists-title' : undefined}
         >
           <div className="font-semibold flex gap-2 items-center ">
             {artists ? <></> : toggleCollapseIcon} {slug.replace(/_/g, ' ')}
