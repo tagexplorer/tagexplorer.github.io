@@ -9,11 +9,15 @@ export const Route = createFileRoute('/help')({
 
 function Help() {
   return (
-    <div className="py-3 px-5 bg">
-      <div className="subtle-bg my-5 py-5 px-4 rounded-lg custom-shadow-md flex flex-col gap-3 text-sm">
+    <div className="px-5 py-3 bg">
+      <div className="flex flex-col px-4 py-5 my-5 text-sm rounded-lg subtle-bg custom-shadow-md gap-3">
         <h2 className="text-lg font-bold">Help</h2>
-        <ul className="list-disc pl-5 flex flex-col gap-3">
-          <li>Every gen on this site was made with Illustrious 1.1.</li>
+        <ul className="flex flex-col pl-5 list-disc gap-3">
+          <li>
+            Artist gens were made with Anima and Illustrious (pick one via the "Model" option).
+            Non-artists gen on this site rere made with Illustrious 1.1, and are also applicable to
+            Anima.
+          </li>
           <li>
             For full generation settings, gens on the Heads, Styles, and Composition pages contain
             ComfyUI workflows.
